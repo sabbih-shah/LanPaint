@@ -192,13 +192,21 @@ def _sanitize_param(value, default, allowed=None):
 def prepare_mask(noise_mask, shape, device,video_inpainting=False):
     return reshape_mask(noise_mask, shape,video_inpainting).to(device)
 def sampling_function_LanPaint(model, x, timestep, uncond, cond, cond_scale, cond_scale_BIG, model_options={}, seed=None):
-    if math.isclose(cond_scale, 1.0) and model_options.get("disable_cfg1_optimization", False) == False:
+    # Both guidance outputs need the negative branch unless both scales are one.
+    if (math.isclose(cond_scale, 1.0) and math.isclose(cond_scale_BIG, 1.0)
+            and not model_options.get("disable_cfg1_optimization", False)):
         uncond_ = None
     else:
         uncond_ = uncond
 
     conds = [cond, uncond_]
-    out = calc_cond_batch(model, conds, x, timestep, model_options)
+    # Match ComfyUI's dispatch so native SkipLayerGuidance remains active.
+    if "sampler_calc_cond_batch_function" in model_options:
+        args = {"conds": conds, "input": x, "sigma": timestep,
+                "model": model, "model_options": model_options}
+        out = model_options["sampler_calc_cond_batch_function"](args)
+    else:
+        out = calc_cond_batch(model, conds, x, timestep, model_options)
 
     for fn in model_options.get("sampler_pre_cfg_function", []):
         args = {"conds":conds, "conds_out": out, "cond_scale": cond_scale, "timestep": timestep,
@@ -1433,3 +1441,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "LanPaint_ImageDecode": "LanPaint Image Decode",
 #    "LanPaint_UpSale_LatentNoiseMask": "LanPaint UpSale Latent Noise Mask"
 }
+
+
+# Kept separate from the sampler to leave the numerical kernel unchanged.
+from .moss import NODE_CLASS_MAPPINGS as MOSS_NODE_CLASS_MAPPINGS
+from .moss import NODE_DISPLAY_NAME_MAPPINGS as MOSS_NODE_DISPLAY_NAME_MAPPINGS
+
+NODE_CLASS_MAPPINGS.update(MOSS_NODE_CLASS_MAPPINGS)
+NODE_DISPLAY_NAME_MAPPINGS.update(MOSS_NODE_DISPLAY_NAME_MAPPINGS)

@@ -725,3 +725,7 @@ note={}
 
 
 
+
+### MOSS Image
+
+MOSS Image inpainting uses native ComfyUI MOSS loading and skip-layer guidance with LanPaint. See [the MOSS workflow and setup guide](examples/MOSS/README.md) for model files, settings, mask conventions, and validation notes.
