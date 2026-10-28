@@ -169,7 +169,8 @@ def test_example_follows_repository_conventions() -> None:
     assert graph["7"]["class_type"] == "LanPaint_MOSSImageEncode"
     assert graph["12"]["class_type"] == "LanPaint_KSamplerAdvanced"
     assert graph["13"]["class_type"] == "LanPaint_ImageDecode"
-    assert graph["13"]["inputs"]["blend_overlap"] == 1
+    assert graph["13"]["inputs"]["blend_overlap"] == 17
+    assert graph["12"]["inputs"]["noise_seed"] == 42
     assert graph["11"]["inputs"]["single_layers"] == "22"
     for node in graph.values():
         for value in node["inputs"].values():

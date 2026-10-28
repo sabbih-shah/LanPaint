@@ -337,7 +337,7 @@
     "Node name for S&R": "CLIPTextEncode"
    },
    "widgets_values": [
-    "A high-resolution surreal digital illustration featuring a woman’s hand in a glossy red glove delicately gripping a clear martini glass, set against a clean white background; the image is overlaid with whimsical, expressive ink-style doodles—including a cartoon figure floating inside the glass, a hand-drawn citrus wedge resting on the rim, and scattered abstract sketches and stylized faces surrounding the glass—rendered in a seamless blend of realistic, softly lit photographic realism for the hand and glass, contrasted with loose, fluid marker artistry for the doodles, creating a playful yet artistic juxtaposition where the crispness of the photograph meets the freeform energy of the inkwork."
+    "A surreal digital illustration of a complete hand and wrist wearing one continuous glossy red satin opera glove, delicately gripping the stem of a clear martini glass. The red glove covers every finger, the thumb, the entire hand, the wrist and the forearm continuing off the right edge of the image. Anatomically natural grip, intact hand connected to wrist. Clean white background, black whimsical ink cartoon doodles and a lemon wedge on the glass."
    ],
    "widgets_values_named": {
     "text": "A close-up photograph of a cobalt blue ceramic espresso cup filled with coffee on a matching blue saucer, a stainless steel spoon, on a rustic wooden table."
@@ -570,7 +570,7 @@
    },
    "widgets_values": [
     "enable",
-    0,
+    42,
     "fixed",
     50,
     3.0,
@@ -636,7 +636,7 @@
     "Node name for S&R": "LanPaint_ImageDecode"
    },
    "widgets_values": [
-    1
+    17
    ],
    "order": 10
   },
