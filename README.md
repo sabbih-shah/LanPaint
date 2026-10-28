@@ -137,6 +137,7 @@ Check our latest [Krea2 Example](#example-krea2-inpaintlanpaint-k-sampler-3-step
   - [Z-image](#example-z-image-inpaintlanpaint-k-sampler-5-steps-of-thinking)
   - [Z-image-base](#example-z-image-base-inpaintlanpaint-k-sampler-3-steps-of-thinking)
   - [Ideogram4](#example-ideogram4-inpaintlanpaint-custom-sampler-advanced-5-steps-of-thinking)
+  - [MOSS](#example-moss-inpaintlanpaint-k-sampler-3-steps-of-thinking)
   - [Krea2](#example-krea2-inpaintlanpaint-k-sampler-3-steps-of-thinking)
   - [Anima](#example-anima-inpaintlanpaint-k-sampler-5-steps-of-thinking)
   - [Hunyuan T2I](#example-hunyuan-t2i-inpaintlanpaint-k-sampler-5-steps-of-thinking)
@@ -422,6 +423,39 @@ LanPaint also supports inpainting with the Z-image-base model.
 [View Workflow & Masks](https://github.com/scraed/LanPaint/tree/master/examples/Example_25)
 
 Workflow template (JSON): [Z_image_base_Inpaint.json](https://github.com/scraed/LanPaint/blob/master/example_workflows/Z_image_base_Inpaint.json)
+
+### Example MOSS: InPaint(LanPaint K Sampler, 3 steps of thinking)
+
+MOSS Image uses ComfyUI's native MOSS loader and negative-branch skip-layer guidance with the existing LanPaint KSampler Advanced and Image Decode nodes.
+
+<details open>
+<summary>View Original / Masked / Inpainted Comparison</summary>
+
+| Original | Masked | Inpainted |
+|:--------:|:------:|:---------:|
+| ![Original MOSS](examples/Example_33/Original_No_Mask.png) | ![Masked MOSS](examples/Example_33/Masked_Load_Me_in_Loader.png) | ![Inpainted MOSS](examples/Example_33/InPainted_Drag_Me_to_ComfyUI.png) |
+
+</details>
+
+[View Workflow & Masks](examples/Example_33) · [Workflow JSON](example_workflows/MOSS_EncodeDecode_Inpaint.json) · [Model Used in This Example](https://huggingface.co/Comfy-Org/MOSS-Image)
+
+Use a recent ComfyUI with native `moss_image` CLIP loading and `SkipLayerGuidanceDiTSimple`. Development validation used ComfyUI v0.42.0 (`b1a247c9cf9dbfda4b2c0a0c1d50950667eeaa0c`). Download these files from the model repository (validated revision `3284a1dbb351e3396d70f39f2a71cbf6ed2ef1bb`):
+
+| ComfyUI directory | File |
+| --- | --- |
+| `models/diffusion_models/` | `moss_image_sft_bf16.safetensors` |
+| `models/text_encoders/` | `qwen3.5_9b_bf16.safetensors` |
+| `models/vae/` | `flux2-vae_small.safetensors` |
+
+Use BF16 for the diffusion model and text encoder, and FP32 for the VAE (`--bf16-unet --bf16-text-enc --fp32-vae`). Keep native MOSS FLOW sampling defaults; no SD3 sampling override is needed.
+
+Load the workflow JSON or drag the output PNG into ComfyUI. Select `Original_No_Mask.png` as the source and `Mask_Load_Me_in_Loader.png` in the mask loader. White edits and black preserves; red in the editor is a preview overlay. The transparent masked PNG is also provided to match the other examples; its inverse alpha contains the same edit mask.
+
+`LanPaint MOSS Image Encode` requires RGB source dimensions divisible by 16. It conservatively pools the pixel mask into native Flux2 `[B,128,H/16,W/16]` latents so thin edits survive. `source_fill=neutral` fills the masked source with gray; `source` retains it for source-conditioned edits. Optional dilation is measured in source pixels. Negative text is empty, with single block 22 skipped only on the negative branch.
+
+Starting settings: Euler/simple, 50 steps, CFG 3, Image First, 3 thinking steps, step size 0.1, lambda 5. The supplied Image Decode uses `blend_overlap=1` for a hard composite that preserves outside-mask source pixels. Larger values use the existing Gaussian boundary blend and can change pixels around the mask. Generous masks help avoid seams and partially edited objects.
+
+The illustration reuses Example 28's source and mask. Its output uses the existing A100 MOSS raw inference, recomposited with the standard decoder's hard-mask behavior. The workflow was repackaged, not freshly sampled on a GPU; identical regeneration is not guaranteed. Earlier integration validation covered 13 real-image functional cases, including thin/full masks, two photo replacements, Prompt First at CFG 1, and outpainting. These establish functional support, not a quality benchmark.
 
 ### Example Krea2: InPaint(LanPaint K Sampler, 3 steps of thinking)
 We are excited to announce that LanPaint now supports inpainting with the Krea2 Turbo text-to-image model.
@@ -720,12 +754,3 @@ url={https://openreview.net/forum?id=JPC8JyOUSW},
 note={}
 }
 ```
-
-
-
-
-
-
-### MOSS Image
-
-MOSS Image inpainting uses native ComfyUI MOSS loading and skip-layer guidance with LanPaint. See [the MOSS workflow and setup guide](examples/MOSS/README.md) for model files, settings, mask conventions, and validation notes.
