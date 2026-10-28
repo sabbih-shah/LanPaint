@@ -193,8 +193,7 @@ def prepare_mask(noise_mask, shape, device,video_inpainting=False):
     return reshape_mask(noise_mask, shape,video_inpainting).to(device)
 def sampling_function_LanPaint(model, x, timestep, uncond, cond, cond_scale, cond_scale_BIG, model_options={}, seed=None):
     # Both guidance outputs need the negative branch unless both scales are one.
-    if (math.isclose(cond_scale, 1.0) and math.isclose(cond_scale_BIG, 1.0)
-            and not model_options.get("disable_cfg1_optimization", False)):
+    if math.isclose(cond_scale, 1.0) and math.isclose(cond_scale_BIG, 1.0) and not model_options.get("disable_cfg1_optimization", False):
         uncond_ = None
     else:
         uncond_ = uncond
@@ -202,8 +201,7 @@ def sampling_function_LanPaint(model, x, timestep, uncond, cond, cond_scale, con
     conds = [cond, uncond_]
     # Match ComfyUI's dispatch so native SkipLayerGuidance remains active.
     if "sampler_calc_cond_batch_function" in model_options:
-        args = {"conds": conds, "input": x, "sigma": timestep,
-                "model": model, "model_options": model_options}
+        args = {"conds": conds, "input": x, "sigma": timestep, "model": model, "model_options": model_options}
         out = model_options["sampler_calc_cond_batch_function"](args)
     else:
         out = calc_cond_batch(model, conds, x, timestep, model_options)
